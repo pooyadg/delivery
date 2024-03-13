@@ -1,11 +1,9 @@
-package com.example.delivery.controller
+package com.example.delivery.controller.dto
 
 import java.time.ZonedDateTime
 
-data class DeliveryDto(
+data class DeliveryPatchDto(
     val id: String? = null,
-    val vehicleId: String,
-    val startedAt: ZonedDateTime,
     var finishedAt: ZonedDateTime? = null,
     var status: String
 )

@@ -1,5 +1,8 @@
 package com.example.delivery.controller
 
+import com.example.delivery.controller.dto.DeliveryDto
+import com.example.delivery.controller.dto.DeliveryPatchDto
+import com.example.delivery.controller.dto.DeliverySummaryDto
 import com.example.delivery.service.DeliveryService
 import org.springframework.web.bind.annotation.*
 
@@ -17,7 +20,8 @@ class DeliveryController(private val deliveryService: DeliveryService) {
     fun updateDelivery(@RequestBody payload: DeliveryPatchDto, @PathVariable("id") id: String): DeliveryDto = deliveryService.updateDelivery(id, payload)
 
     @PatchMapping("deliveries/bulk-update")
-    fun updateDelivery(@RequestBody payload: List<DeliveryDto>): DeliveryDto = deliveryService.updateDelivery(payload)
+    //TODO Limit the number of items to 100!
+    fun updateDelivery(@RequestBody payload: List<DeliveryPatchDto>): List<DeliveryDto> = deliveryService.updateDelivery(payload)
 
     @GetMapping("deliveries/business-summary")
     fun getDeliverySummary(): DeliverySummaryDto = deliveryService.getDeliverySummary()

@@ -1,6 +1,6 @@
 package com.example.delivery.service.mapper
 
-import com.example.delivery.controller.DeliveryDto
+import com.example.delivery.controller.dto.DeliveryDto
 import com.example.delivery.domain.DeliveryEntity
 import com.example.delivery.domain.DeliveryStatus
 

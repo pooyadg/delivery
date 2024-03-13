@@ -1,4 +1,4 @@
-package com.example.delivery.controller
+package com.example.delivery.controller.dto
 
 data class DeliverySummaryDto(
     val deliveries: Int,

@@ -1,24 +1,24 @@
 package com.example.delivery.service
 
-import com.example.delivery.controller.DeliveryDto
-import com.example.delivery.controller.DeliveryPatchDto
-import com.example.delivery.controller.DeliverySummaryDto
+import com.example.delivery.controller.dto.DeliveryDto
+import com.example.delivery.controller.dto.DeliveryPatchDto
+import com.example.delivery.controller.dto.DeliverySummaryDto
 import com.example.delivery.domain.DeliveryEntity
 import com.example.delivery.domain.DeliveryStatus
 import com.example.delivery.exception.*
 import com.example.delivery.repository.DeliveryRepository
 import com.example.delivery.service.mapper.toDto
 import com.example.delivery.service.mapper.toEntity
+import jakarta.transaction.Transactional
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties.IsolationLevel
 import org.springframework.stereotype.Service
 import java.util.*
-import kotlin.NoSuchElementException
 
 /**
  *  A service to perform basic CRUD operations for DeliveryEntity
  */
 @Service
 class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : DeliveryService {
-
 
     override fun addNewDelivery(deliveryDto: DeliveryDto): DeliveryDto {
         val deliveryToPersist = deliveryDto.toEntity();
@@ -48,6 +48,7 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
      */
     override fun updateDelivery(id: String, deliveryPatchDto: DeliveryPatchDto): DeliveryDto {
 
+
         val deliveryPatchStatus = DeliveryStatus.valueOf(deliveryPatchDto.status.uppercase())
         if (deliveryPatchDto.finishedAt != null && deliveryPatchStatus != DeliveryStatus.DELIVERED) {
             throw NotAllowedServiceException("Updating finishedAt property is not allowed when the status is not DELIVERED")
@@ -74,8 +75,17 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
         return persistedPatch.toDto()
     }
 
-    override fun updateDelivery(deliveryDtoList: List<DeliveryDto>): DeliveryDto {
-        TODO("Not yet implemented")
+    @Transactional
+    override fun updateDelivery(deliveryPatchDtoList: List<DeliveryPatchDto>): List<DeliveryDto> {
+
+        val responseList= mutableListOf<DeliveryDto>()
+        deliveryPatchDtoList.forEach {
+            if (it.id == null) {
+                throw BadRequestServiceException("Id must be provided.")
+            }
+            responseList.addLast(updateDelivery(it.id, it))
+        }
+        return responseList
     }
 
     override fun getDeliverySummary(): DeliverySummaryDto {

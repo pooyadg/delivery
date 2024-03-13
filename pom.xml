@@ -77,7 +77,7 @@
 
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
 		<!-- added due to com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 date/time type `java.time.ZonedDateTime` not supported by default:
-		add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: com.example.delivery.controller.DeliveryDto["startedAt"])
+		add Module "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" to enable handling (through reference chain: com.example.delivery.controller.dto.DeliveryDto["startedAt"])
 		-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>

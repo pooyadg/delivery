@@ -24,7 +24,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-class DeliveryServiceTest {
+class DeliveryServiceBulkOperationsTest {
 
 
     @MockK
@@ -61,51 +61,11 @@ class DeliveryServiceTest {
             finishedAt = ZonedDateTime.parse("2023-10-09T12:45:34.678Z"),
             status = "DELIVERED",
         )
-
-
     }
 
-    @Test
-    fun addNewDelivery() {
-
-        val deliveryEntitySlot = slot<DeliveryEntity>()
-        mockkStatic(UUID::class)
-
-        every { UUID.randomUUID().toString() } returns sampleUuid
-        every { deliveryRepository.findByVehicleId(any()) } returns Optional.empty()
-        every { deliveryRepository.save(capture(deliveryEntitySlot)) } returns sampleDeliveryEntity
-
-        val actualDeliveryDtoResponse = deliveryService.addNewDelivery(sampleDeliveryDto);
-
-        assertTrue(deliveryEntitySlot.captured.uuid == sampleUuid)
-        assertEquals(actualDeliveryDtoResponse, sampleDeliveryEntity.toDto())
-
-        verify(exactly = 1) { deliveryRepository.findByVehicleId(any()) }
-        verify(exactly = 1) { deliveryRepository.save(any()) }
-
-    }
 
     @Test
-    fun addNewDelivery_Failure_deliveryAlreadyExists() {
-
-        val deliveryEntitySlot = slot<DeliveryEntity>()
-        mockkStatic(UUID::class)
-
-        every { UUID.randomUUID().toString() } returns sampleUuid
-        every { deliveryRepository.findByVehicleId(any()) } returns Optional.of(sampleDeliveryEntity)
-        every { deliveryRepository.save(capture(deliveryEntitySlot)) } throws AlreadyExistsServiceException(null)
-
-        assertThrows<AlreadyExistsServiceException> {
-            deliveryService.addNewDelivery(sampleDeliveryDto)
-        }
-
-        verify(exactly = 1) { deliveryRepository.findByVehicleId(any()) }
-        verify(exactly = 0) { deliveryRepository.save(any()) }
-
-    }
-
-    @Test
-    fun patchDelivery_success() {
+    fun bulkPatchDelivery_success() {
 
         val deliveryEntitySlot = slot<DeliveryEntity>()
         mockkStatic(UUID::class)
