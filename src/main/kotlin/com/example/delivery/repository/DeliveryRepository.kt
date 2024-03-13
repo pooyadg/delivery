@@ -8,4 +8,5 @@ import java.util.Optional
 @Repository
 interface DeliveryRepository : CrudRepository<DeliveryEntity, Long> {
     fun findByVehicleId(vehicleId: String): Optional<DeliveryEntity>
+    fun findByUuid(uuid: String): Optional<DeliveryEntity>
 }

@@ -12,7 +12,7 @@ fun DeliveryDto.toEntity() = DeliveryEntity(
     vehicleId = vehicleId,
     startedAt = startedAt,
     finishedAt = finishedAt,
-    status = DeliveryStatus.valueOf(status).id,
+    status = DeliveryStatus.valueOf(status.uppercase()).id,
 )
 
 fun DeliveryEntity.toDto() = DeliveryDto(

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import java.time.ZonedDateTime
 
@@ -23,6 +24,7 @@ class DeliveryControllerTest(@Autowired val mockMvc: MockMvc, @Autowired val map
 
     private lateinit var sampleUuid: String
     private lateinit var sampleDeliveryDto: DeliveryDto
+    private lateinit var sampleDeliveryPatchDto: DeliveryPatchDto
 
     @BeforeEach
     fun setup() {
@@ -32,18 +34,23 @@ class DeliveryControllerTest(@Autowired val mockMvc: MockMvc, @Autowired val map
             startedAt = ZonedDateTime.parse("2023-10-09T12:45:34.678Z"),
             status = "IN_PROGRESS",
         )
+        sampleDeliveryPatchDto = DeliveryPatchDto(
+            finishedAt = ZonedDateTime.parse("2023-10-09T12:45:34.678Z"),
+            status = "DELIVERED",
+        )
     }
 
-
     @Test
-    fun whenPostRequestWithDeliveryJson_thenReturnsStatus200() {
+    fun whenPatchRequestWithDeliveryPatchJson_thenReturnsStatus200() {
         val responseDeliveryDto = sampleDeliveryDto.copy(id = sampleUuid)
+        responseDeliveryDto.status = sampleDeliveryPatchDto.status
+        responseDeliveryDto.finishedAt = sampleDeliveryPatchDto.finishedAt
 
-        every { deliveryService.addNewDelivery(sampleDeliveryDto) } returns responseDeliveryDto;
+        every { deliveryService.updateDelivery(sampleUuid, sampleDeliveryPatchDto) } returns responseDeliveryDto;
 
-        mockMvc.post("/deliveries") {
+        mockMvc.patch("/deliveries/$sampleUuid") {
             contentType = MediaType.APPLICATION_JSON
-            content = mapper.writeValueAsString(sampleDeliveryDto)
+            content = mapper.writeValueAsString(sampleDeliveryPatchDto)
             accept = MediaType.APPLICATION_JSON
         }.andExpect {
             status { isOk() }
@@ -51,7 +58,7 @@ class DeliveryControllerTest(@Autowired val mockMvc: MockMvc, @Autowired val map
             content { json(mapper.writeValueAsString(responseDeliveryDto)) }
         }
 
-        verify (exactly = 1) { deliveryService.addNewDelivery(sampleDeliveryDto) }
+        verify(exactly = 1) { deliveryService.updateDelivery(sampleUuid, sampleDeliveryPatchDto) }
     }
 
 }

@@ -1,14 +1,21 @@
 package com.example.delivery.service
 
 import com.example.delivery.controller.DeliveryDto
+import com.example.delivery.controller.DeliveryPatchDto
 import com.example.delivery.domain.DeliveryEntity
 import com.example.delivery.domain.DeliveryStatus
+import com.example.delivery.exception.AlreadyExistsServiceException
+import com.example.delivery.exception.NoChangeServiceException
+import com.example.delivery.exception.NotAllowedServiceException
+import com.example.delivery.exception.ResourceNotFoundServiceException
 import com.example.delivery.repository.DeliveryRepository
 import com.example.delivery.service.mapper.toDto
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import net.bytebuddy.matcher.ElementMatchers
+import net.bytebuddy.matcher.ElementMatchers.any
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -33,10 +40,11 @@ class DeliveryServiceTest {
     private lateinit var sampleUuid: String
     private lateinit var sampleDeliveryDto: DeliveryDto
     private lateinit var sampleDeliveryEntity: DeliveryEntity
+    private lateinit var sampleDeliveryPatchDto: DeliveryPatchDto
 
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         sampleUuid = "69201507-0ae4-4c56-ac2d-75fbe27efad8"
         sampleDeliveryDto = DeliveryDto(
             vehicleId = "AHV-589",
@@ -50,6 +58,13 @@ class DeliveryServiceTest {
             status = DeliveryStatus.IN_PROGRESS.id,
             uuid = sampleUuid
         )
+
+        sampleDeliveryPatchDto = DeliveryPatchDto(
+            finishedAt = ZonedDateTime.parse("2023-10-09T12:45:34.678Z"),
+            status = "DELIVERED",
+        )
+
+
     }
 
     @Test
@@ -67,27 +82,94 @@ class DeliveryServiceTest {
         assertTrue(deliveryEntitySlot.captured.uuid == sampleUuid)
         assertEquals(actualDeliveryDtoResponse, sampleDeliveryEntity.toDto())
 
-        verify (exactly = 1) { deliveryRepository.findByVehicleId(any()) }
-        verify (exactly = 1) { deliveryRepository.save(any()) }
+        verify(exactly = 1) { deliveryRepository.findByVehicleId(any()) }
+        verify(exactly = 1) { deliveryRepository.save(any()) }
 
     }
 
     @Test
-    fun addNewDelivery_deliveryExist() {
+    fun addNewDelivery_Failure_deliveryAlreadyExists() {
 
         val deliveryEntitySlot = slot<DeliveryEntity>()
         mockkStatic(UUID::class)
 
         every { UUID.randomUUID().toString() } returns sampleUuid
         every { deliveryRepository.findByVehicleId(any()) } returns Optional.of(sampleDeliveryEntity)
-        every { deliveryRepository.save(capture(deliveryEntitySlot)) } throws RuntimeException()
+        every { deliveryRepository.save(capture(deliveryEntitySlot)) } throws AlreadyExistsServiceException(null)
 
-        assertThrows<RuntimeException>{
+        assertThrows<AlreadyExistsServiceException> {
             deliveryService.addNewDelivery(sampleDeliveryDto)
         }
 
-        verify (exactly = 1) { deliveryRepository.findByVehicleId(any()) }
-        verify (exactly = 0) { deliveryRepository.save(any()) }
+        verify(exactly = 1) { deliveryRepository.findByVehicleId(any()) }
+        verify(exactly = 0) { deliveryRepository.save(any()) }
 
     }
+
+    @Test
+    fun patchDelivery_success() {
+
+        val deliveryEntitySlot = slot<DeliveryEntity>()
+        mockkStatic(UUID::class)
+
+        every { deliveryRepository.findByUuid(any()) } returns Optional.of(sampleDeliveryEntity)
+        every { deliveryRepository.save(capture(deliveryEntitySlot)) } returns sampleDeliveryEntity
+
+        val actualDeliveryDtoResponse = deliveryService.updateDelivery(sampleUuid, sampleDeliveryPatchDto);
+
+        assertTrue(deliveryEntitySlot.captured.status == DeliveryStatus.valueOf(sampleDeliveryPatchDto.status).id)
+        assertTrue(deliveryEntitySlot.captured.finishedAt == sampleDeliveryPatchDto.finishedAt)
+
+        assertEquals(actualDeliveryDtoResponse, sampleDeliveryEntity.toDto())
+
+        verify(exactly = 1) { deliveryRepository.findByUuid(any()) }
+        verify(exactly = 1) { deliveryRepository.save(any()) }
+
+    }
+
+    @Test
+    fun patchDelivery_failure_NotAllowedServiceException() {
+
+        sampleDeliveryPatchDto.status = "IN_PROGRESS"
+
+        assertThrows<NotAllowedServiceException> {
+            deliveryService.updateDelivery(sampleUuid, sampleDeliveryPatchDto)
+        }
+
+        verify(exactly = 0) { deliveryRepository.findByUuid(any()) }
+        verify(exactly = 0) { deliveryRepository.save(any()) }
+
+    }
+
+    @Test
+    fun patchDelivery_failure_ResourceNotFoundServiceException() {
+
+        every { deliveryRepository.findByUuid(any()) } returns Optional.empty()
+
+        assertThrows<ResourceNotFoundServiceException> {
+            deliveryService.updateDelivery(sampleUuid, sampleDeliveryPatchDto)
+        }
+
+        verify(exactly = 1) { deliveryRepository.findByUuid(any()) }
+        verify(exactly = 0) { deliveryRepository.save(any()) }
+
+    }
+    @Test
+    fun patchDelivery_failure_NoChangeServiceException() {
+
+        sampleDeliveryPatchDto.status = DeliveryStatus.from(sampleDeliveryEntity.status).toString()
+        sampleDeliveryPatchDto.finishedAt = sampleDeliveryEntity.finishedAt
+
+        every { deliveryRepository.findByUuid(any()) } returns Optional.of(sampleDeliveryEntity)
+
+        assertThrows<NoChangeServiceException> {
+            deliveryService.updateDelivery(sampleUuid, sampleDeliveryPatchDto)
+        }
+
+        verify(exactly = 1) { deliveryRepository.findByUuid(any()) }
+        verify(exactly = 0) { deliveryRepository.save(any()) }
+
+    }
+
+
 }

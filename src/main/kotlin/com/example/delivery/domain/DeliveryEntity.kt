@@ -23,8 +23,8 @@ data class DeliveryEntity(
     val startedAt: ZonedDateTime,
 
     @Column(name = "finished_at", nullable = true)
-    val finishedAt: ZonedDateTime? = null,
+    var finishedAt: ZonedDateTime? = null,
 
     @Column(name = "status", nullable = false)
-    val status: Byte,
+    var status: Byte,
 )
