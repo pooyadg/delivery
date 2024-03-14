@@ -12,6 +12,7 @@ import com.example.delivery.service.mapper.toEntity
 import jakarta.transaction.Transactional
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties.IsolationLevel
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 /**
@@ -83,13 +84,12 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
             if (it.id == null) {
                 throw BadRequestServiceException("Id must be provided.")
             }
-            responseList.addLast(updateDelivery(it.id, it))
+            responseList.add(updateDelivery(it.id, it))
         }
         return responseList
     }
 
-    override fun getDeliverySummary(): DeliverySummaryDto {
-        TODO("Not yet implemented")
-    }
+
+
 
 }

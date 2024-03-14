@@ -3,6 +3,8 @@ package com.example.delivery.service
 import com.example.delivery.controller.dto.DeliveryDto
 import com.example.delivery.controller.dto.DeliveryPatchDto
 import com.example.delivery.controller.dto.DeliverySummaryDto
+import com.example.delivery.domain.DeliveryEntity
+import java.time.LocalDateTime
 
 
 interface DeliveryService {
@@ -15,8 +17,5 @@ interface DeliveryService {
 
     /* Updates multiple deliveries. */
     fun updateDelivery(deliveryPatchDtoList: List<DeliveryPatchDto>): List<DeliveryDto>
-
-    /* Provides summary of the deliveries */
-    fun getDeliverySummary(): DeliverySummaryDto
 
 }

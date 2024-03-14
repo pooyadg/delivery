@@ -4,6 +4,7 @@ import com.example.delivery.controller.dto.DeliveryDto
 import com.example.delivery.controller.dto.DeliveryPatchDto
 import com.example.delivery.domain.DeliveryStatus
 import com.example.delivery.service.DeliveryService
+import com.example.delivery.service.SummaryService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -23,6 +24,9 @@ class DeliveryControllerTest(@Autowired val mockMvc: MockMvc, @Autowired val map
 
     @MockkBean
     lateinit var deliveryService: DeliveryService
+
+    @MockkBean
+    lateinit var summaryService: SummaryService
 
     private lateinit var sampleUuid: String
     private lateinit var sampleDeliveryDto: DeliveryDto
