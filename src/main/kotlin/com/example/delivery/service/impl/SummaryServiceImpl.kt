@@ -7,6 +7,7 @@ import com.example.delivery.repository.DeliveryRepository
 import com.example.delivery.repository.SummaryRepository
 import com.example.delivery.service.SummaryService
 import com.example.delivery.service.mapper.toDto
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -20,7 +21,13 @@ class SummaryServiceImpl(
     }
 
     override fun getDeliverySummary(): DeliverySummaryDto {
-        val deliverySummaryEntity: DeliverySummaryEntity = summaryRepository.findTopByOrderByCreatedAtDesc()
+        val deliverySummaryEntity: DeliverySummaryEntity
+        try {
+            deliverySummaryEntity = summaryRepository.findTopByOrderByCreatedAtDesc()
+
+        } catch (exception: EmptyResultDataAccessException) {
+            return DeliverySummaryDto()
+        }
         return deliverySummaryEntity.toDto()
     }
 

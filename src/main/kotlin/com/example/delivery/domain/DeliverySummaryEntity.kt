@@ -11,12 +11,12 @@ data class DeliverySummaryEntity(
     val id: Long? = 0,
 
     @Column(name = "deliveries")
-    val deliveries: Int,
+    val deliveries: Int = 0,
 
     @Column(name = "average_minutes_between_delivery_start")
-    val averageMinutesBetweenDeliveryStart: Int,
+    val averageMinutesBetweenDeliveryStart: Int = 0,
 
     @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime?
+    val createdAt: LocalDateTime? = null
 
 )
