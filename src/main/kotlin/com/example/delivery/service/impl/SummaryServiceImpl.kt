@@ -1,10 +1,11 @@
-package com.example.delivery.service
+package com.example.delivery.service.impl
 
 import com.example.delivery.controller.dto.DeliverySummaryDto
 import com.example.delivery.domain.DeliveryEntity
 import com.example.delivery.domain.DeliverySummaryEntity
 import com.example.delivery.repository.DeliveryRepository
 import com.example.delivery.repository.SummaryRepository
+import com.example.delivery.service.SummaryService
 import com.example.delivery.service.mapper.toDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime

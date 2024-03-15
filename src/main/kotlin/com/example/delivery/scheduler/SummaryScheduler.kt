@@ -1,7 +1,8 @@
-package com.example.delivery.service
+package com.example.delivery.scheduler
 
 import com.example.delivery.domain.DeliverySummaryEntity
 import com.example.delivery.repository.SummaryRepository
+import com.example.delivery.service.SummaryService
 import com.example.delivery.util.DeliveryUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,16 +13,15 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 @Component
-class SummarySchedulerService(
+class SummaryScheduler(
     private val summaryService: SummaryService,
     private val summaryRepository: SummaryRepository,
-    @Value("\${scheduler.cron.expression}") private val cronExpression: String,
     @Value("\${scheduler.time.zone}") private val timeZone: String
 ) {
 
     val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    @Scheduled(cron = "\${scheduler.cron.expression}", zone = "\${scheduler.time.zone}")
+    @Scheduled(cron = "\${scheduler.cron.expression}")
     fun generateAndInsertSummaryReport() {
         logger.debug("generateAndInsertSummaryReport started!")
         val yesterday = LocalDateTime.now(ZoneId.of(timeZone)).minusDays(1)

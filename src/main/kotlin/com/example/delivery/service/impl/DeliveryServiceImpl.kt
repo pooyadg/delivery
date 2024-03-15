@@ -1,18 +1,16 @@
-package com.example.delivery.service
+package com.example.delivery.service.impl
 
 import com.example.delivery.controller.dto.DeliveryDto
 import com.example.delivery.controller.dto.DeliveryPatchDto
-import com.example.delivery.controller.dto.DeliverySummaryDto
 import com.example.delivery.domain.DeliveryEntity
 import com.example.delivery.domain.DeliveryStatus
 import com.example.delivery.exception.*
 import com.example.delivery.repository.DeliveryRepository
+import com.example.delivery.service.DeliveryService
 import com.example.delivery.service.mapper.toDto
 import com.example.delivery.service.mapper.toEntity
 import jakarta.transaction.Transactional
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties.IsolationLevel
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.*
 
 /**
@@ -24,7 +22,6 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
     override fun addNewDelivery(deliveryDto: DeliveryDto): DeliveryDto {
         val deliveryToPersist = deliveryDto.toEntity();
 
-        //TODO: catch IncorrectResultSizeDataAccessException
         val deliveryEntityOptional = deliveryRepository.findByVehicleId(deliveryToPersist.vehicleId)
 
         if (deliveryEntityOptional.isEmpty) {
@@ -33,12 +30,10 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
                 deliveryToPersist.uuid = UUID.randomUUID().toString();
                 persistedEntity = deliveryRepository.save(deliveryToPersist)
             } catch (ex: Exception) {
-                //TODO: HTTP status 500
                 throw CustomServiceException("An error happened on persisting $deliveryToPersist", ex)
             }
             return persistedEntity.toDto()
         } else {
-            //TODO: HTTP status 403
             throw AlreadyExistsServiceException("Vehicle with id= ${deliveryEntityOptional.get().vehicleId} already exists.")
         }
 
@@ -57,7 +52,6 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
 
         val deliveryEntityOptional = deliveryRepository.findByUuid(id)
         if (deliveryEntityOptional.isEmpty) {
-            //TODO status 404
             throw ResourceNotFoundServiceException("No delivery found with id= $id")
         }
 
@@ -65,7 +59,6 @@ class DeliveryServiceImpl(private val deliveryRepository: DeliveryRepository) : 
         if (DeliveryStatus.from(deliveryEntity.status) == deliveryPatchStatus
             && deliveryEntity.finishedAt == deliveryPatchDto.finishedAt
         ) {
-            //TODO status 304 looks good
             throw NoChangeServiceException("Nothing to change for the delivery $id with $deliveryPatchDto")
         }
 

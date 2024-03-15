@@ -4,11 +4,11 @@ import com.example.delivery.controller.dto.DeliveryDto
 import com.example.delivery.controller.dto.DeliveryPatchDto
 import com.example.delivery.domain.DeliveryEntity
 import com.example.delivery.domain.DeliveryStatus
-import com.example.delivery.exception.AlreadyExistsServiceException
 import com.example.delivery.exception.NoChangeServiceException
 import com.example.delivery.exception.NotAllowedServiceException
 import com.example.delivery.exception.ResourceNotFoundServiceException
 import com.example.delivery.repository.DeliveryRepository
+import com.example.delivery.service.impl.DeliveryServiceImpl
 import com.example.delivery.service.mapper.toDto
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs

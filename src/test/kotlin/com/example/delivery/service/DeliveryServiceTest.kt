@@ -9,6 +9,7 @@ import com.example.delivery.exception.NoChangeServiceException
 import com.example.delivery.exception.NotAllowedServiceException
 import com.example.delivery.exception.ResourceNotFoundServiceException
 import com.example.delivery.repository.DeliveryRepository
+import com.example.delivery.service.impl.DeliveryServiceImpl
 import com.example.delivery.service.mapper.toDto
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs

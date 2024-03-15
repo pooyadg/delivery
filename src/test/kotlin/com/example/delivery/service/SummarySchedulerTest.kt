@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
-class SummarySchedulerServiceTest {
+class SummarySchedulerTest {
 
 
     private lateinit var sampleUuid: String
