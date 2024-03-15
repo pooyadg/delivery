@@ -7,6 +7,7 @@ import com.example.delivery.repository.DeliveryRepository
 import com.example.delivery.repository.SummaryRepository
 import com.example.delivery.service.SummaryService
 import com.example.delivery.service.mapper.toDto
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -20,11 +21,11 @@ class SummaryServiceImpl(
         return deliveryRepository.findByStartedAtDay(day)
     }
 
-    override fun getDeliverySummary(): DeliverySummaryDto {
+    @Cacheable("summaryCache" , key = "#day.dayOfYear")
+    override fun getDeliverySummary(day: LocalDateTime): DeliverySummaryDto {
         val deliverySummaryEntity: DeliverySummaryEntity
         try {
-            deliverySummaryEntity = summaryRepository.findTopByOrderByCreatedAtDesc()
-
+            deliverySummaryEntity = summaryRepository.findFirstByCreatedAtDay(day)!!
         } catch (exception: EmptyResultDataAccessException) {
             return DeliverySummaryDto()
         }

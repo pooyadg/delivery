@@ -6,6 +6,7 @@ import com.example.delivery.controller.dto.DeliverySummaryDto
 import com.example.delivery.service.DeliveryService
 import com.example.delivery.service.SummaryService
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 
 /**
@@ -30,7 +31,7 @@ class DeliveryController(
         deliveryService.updateDelivery(payload)
 
     @GetMapping("deliveries/business-summary")
-    fun getDeliverySummary(): DeliverySummaryDto = deliverySummaryService.getDeliverySummary()
+    fun getDeliverySummary(): DeliverySummaryDto = deliverySummaryService.getDeliverySummary(LocalDateTime.now())
 
 
 }

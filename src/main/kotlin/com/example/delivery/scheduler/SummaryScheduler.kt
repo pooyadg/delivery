@@ -7,6 +7,8 @@ import com.example.delivery.util.DeliveryUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.CacheManager
+import org.springframework.cache.get
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -14,6 +16,7 @@ import java.time.ZoneId
 
 @Component
 class SummaryScheduler(
+    private val cacheManager: CacheManager,
     private val summaryService: SummaryService,
     private val summaryRepository: SummaryRepository,
     @Value("\${scheduler.time.zone}") private val timeZone: String
@@ -35,6 +38,7 @@ class SummaryScheduler(
         )
         logger.debug("{} is going to be registered!", summary)
         summaryRepository.save(summary)
+        cacheManager["summaryCache"]?.evict(LocalDateTime.now().dayOfYear)
     }
 
 }
