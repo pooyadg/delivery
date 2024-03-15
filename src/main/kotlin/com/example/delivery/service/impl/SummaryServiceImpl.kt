@@ -21,12 +21,13 @@ class SummaryServiceImpl(
         return deliveryRepository.findByStartedAtDay(day)
     }
 
-    @Cacheable("summaryCache" , key = "#day.dayOfYear")
+    @Cacheable("summaryCache", key = "#day.dayOfYear")
     override fun getDeliverySummary(day: LocalDateTime): DeliverySummaryDto {
         val deliverySummaryEntity: DeliverySummaryEntity
+
         try {
             deliverySummaryEntity = summaryRepository.findFirstByCreatedAtDay(day)!!
-        } catch (exception: EmptyResultDataAccessException) {
+        } catch (exception: Exception) {
             return DeliverySummaryDto()
         }
         return deliverySummaryEntity.toDto()
